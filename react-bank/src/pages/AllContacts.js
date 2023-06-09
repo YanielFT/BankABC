@@ -6,37 +6,35 @@ import { useSelector, useDispatch } from "react-redux";
 import { cartActions } from "../store/cart-slice";
 import ContactSearch from "../components/search/ContactSearch";
 import ContactSerachByNameAddresss from "../components/search/ContactSerachByNameAddresss";
+import NoContactFound from "../components/contacts/NoContactFound";
 
 
 const AllContacts = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(state => state.cart.items);
-  console.log(contacts)
   const {sendRequest:fetchContacts, isLoading, error} = useHttp();
   
- 
+  const transformeContacts =  contactObject => {
+
+    const items = [];
+
+     
+    for(const taskKey in contactObject){
+      items.push({
+        id:contactObject[taskKey].id,
+        firstName:contactObject[taskKey].firstName,
+        lastName:contactObject[taskKey].lastName,
+        address:contactObject[taskKey].address,
+        phone:contactObject[taskKey].phone,
+        photo:contactObject[taskKey].photo,
+        birthday:contactObject[taskKey].birthday},
+        )
+    }
+
+    dispatch(cartActions.setData(items))
+  };
 
   useEffect(() => {
-    const transformeContacts =  contactObject => {
-
-      const items = [];
-  
-       
-      for(const taskKey in contactObject){
-        items.push({
-          id:contactObject[taskKey].id,
-          firstName:contactObject[taskKey].firstName,
-          lastName:contactObject[taskKey].lastName,
-          address:contactObject[taskKey].address,
-          phone:contactObject[taskKey].phone,
-          photo:contactObject[taskKey].photo,
-          birthday:contactObject[taskKey].birthday},
-          )
-      }
-  
-      dispatch(cartActions.setData(items))
-    };
-    
     fetchContacts( 
      {url: 'http://localhost:8080/api/v1/contacts/'}
     ,transformeContacts
@@ -55,15 +53,17 @@ const AllContacts = () => {
     content = <div className="loading"><LoadingSpinner/></div> 
   }
 
-  if(!error && !isLoading){
+  if(!isLoading && !error){
     if(contacts.length > 0)
     content =  <ContactList contacts = {contacts}/>
-    else <h2>No contacts found. Start adding some!</h2>;
+    else content = <NoContactFound/>;
   }
 
+
  return <Fragment>
-  <ContactSearch/>
-  <ContactSerachByNameAddresss/>
+  {!error  &&
+  <Fragment><ContactSearch /><ContactSerachByNameAddresss /></Fragment>
+  }
   {content}
  </Fragment> 
 };

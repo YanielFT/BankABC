@@ -4,6 +4,7 @@ import NotFound from "./NotFound";
 import { useSelector } from "react-redux";
 import ContactForm from "../components/contacts/ContactForm";
 import useHttp from "../hooks/use-http";
+import PhotoPerfil from "../components/UI/photoPerfil";
 
 
 const ContactDetail = () => {
@@ -39,6 +40,7 @@ const ContactDetail = () => {
 
   return (
     <Fragment>
+      <PhotoPerfil photo={quote.photo}/>
        <ContactForm contact = {quote} onAddContact={onAddContactHandler} isLoading={isLoading} error={error} />
     </Fragment>
   );
